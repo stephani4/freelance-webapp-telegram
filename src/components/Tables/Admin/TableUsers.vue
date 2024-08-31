@@ -2,19 +2,22 @@
 import {defineProps, defineEmits} from "vue";
 import moment from "moment";
 
-import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+import UserRolesPopover from "@/components/Popovers/UserRolesPopover.vue";
+
+const emits = defineEmits(["updateUserRoles"]);
 
 const normalizeDate = (date) => moment(new Date(date)).format("YYYY-MM-DD HH:mm:ss");
 
-const emits = defineEmits(["toggleViewRoles"]);
-
-const toggleViewRoles = (data) => emits('toggleViewRoles', data);
-
 const props = defineProps({
   users: Object,
+  roles: Array,
 });
+
+const updateRoles = (userRoles) => {
+  emits("updateUserRoles", userRoles);
+};
 </script>
 
 <template>
@@ -27,9 +30,12 @@ const props = defineProps({
     </Column>
     <Column field="actions" header="">
       <template #body="{data}">
-        <Button @click="(event) => toggleViewRoles({event, data})" size="small" outlined v-tooltip.left="'Изменение ролей пользователя'">
-          <i class="pi pi-shield"></i>
-        </Button>
+        <UserRolesPopover
+            @updateUserRoles="updateRoles"
+            :roles="props.roles"
+            :users="props.users.list"
+            :user="data"
+        />
       </template>
     </Column>
   </DataTable>

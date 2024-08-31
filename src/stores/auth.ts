@@ -5,6 +5,7 @@ import { defineStore } from 'pinia';
 
 import type {Register} from "@/types/auth/register";
 
+import {checkTelegram} from "@/services/auth/check-telegram";
 import {register} from "@/services/auth/register";
 import {check} from "@/services/auth/check";
 import {refresh} from "@/services/auth/refresh";
@@ -14,11 +15,33 @@ import {useTokensStore} from "./tokens";
 export const useAuthStore = defineStore('auth', () => {
     const
         auth = ref(false),
-        user = reactive({});
+        user = reactive({}),
+        mode = ref('webapp');
 
     const router = useRouter();
 
     const {setAccessToken, getAccessToken} = useTokensStore();
+
+    const checkAuthUserWebapp = async (webAppInitData: string) => {
+        try {
+            const {data} = await checkTelegram(webAppInitData);
+            const {user: userData, token} = data;
+
+            // Устанавливаем токен
+            setAccessToken(token);
+
+            // Присваиваем данные пользователя
+            for (let key of Object.keys(userData)) {
+                user[key] = userData[key];
+            }
+
+            // Включаем авторизацию
+            auth.value = true;
+        } catch (e) {
+            alert(e.message)
+        }
+    };
+
     const checkAuthUser = async () => {
         if (!getAccessToken()) {
             return;
@@ -46,7 +69,6 @@ export const useAuthStore = defineStore('auth', () => {
     const registerUser = async (data: Object) => {
         const requestData: Register = {
             description: data.description,
-            telegram_id: data.telegramId,
             specialty: data.specialty,
             email: data.email,
             name: data.name,
@@ -69,11 +91,19 @@ export const useAuthStore = defineStore('auth', () => {
         auth.value = true;
     };
 
+    const setMode = (newMode: string) => {
+        mode.value = newMode;
+    };
+
     return {
         auth,
         user,
+        mode,
+
+        setMode,
         registerUser,
         checkAuthUser,
         refreshTokenUser,
+        checkAuthUserWebapp,
     };
 })

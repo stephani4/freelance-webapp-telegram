@@ -9,8 +9,8 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 export default ({ mode }) => {
   return defineConfig({
     define: {
-      BACKEND_SERVER_URL: `"http://127.0.0.1:8000"`,
-      API_URL: `"http://127.0.0.1:8000/api"`,
+      BACKEND_SERVER_URL: `"https://d4kosy-95-181-26-94.ru.tuna.am"`,
+      API_URL: `"https://d4kosy-95-181-26-94.ru.tuna.am/api"`,
     },
     server: {
       host: '127.0.0.1'

@@ -7,15 +7,18 @@ import ECommerceView from '@/views/Dashboard/ECommerceView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 import ServiceCategories from "@/views/ServiceCategories/ServiceCategories.vue"
 import ProfileView from '@/views/ProfileView.vue'
-import TasksView from '@/views/TasksView.vue'
+import TasksView from '@/views/Tasks/TasksView.vue'
 import TasksMyView from "@/views/Tasks/TasksMyView.vue";
 import TasksCreateView from "@/views/Tasks/TasksCreateView.vue";
+import TasksMyEditView from "@/views/Tasks/TasksMyEditView.vue";
 import TasksModerationView from "@/views/Admins/Tasks/TasksModerationView.vue";
 import UsersView from "@/views/Admins/Users/UsersView.vue";
+import CashCardsView from "@/views/CashCards/CashCardsView.vue";
+import ChatsView from "@/views/Chats/ChatsView.vue";
+import ChatView from "@/views/Chats/ChatView.vue";
 
 import middlewarePipeline from "@/router/middlewarePipeline";
 import {authMiddleware} from "./middleware/auth";
-import TasksMyEditView from "@/views/Tasks/TasksMyEditView.vue";
 
 const routes = [
     {
@@ -28,13 +31,30 @@ const routes = [
         }
     },
     {
+      path: '/chats',
+      name: 'chats',
+      component: ChatsView,
+      meta: {
+        title: 'Чаты',
+        middleware: [authMiddleware]
+      }
+    },
+    {
+        path: "/chats/:chat/view",
+        name: 'chat',
+        component: ChatView,
+        meta: {
+            title: 'Чат с пользователем',
+            middleware: [authMiddleware]
+        }
+    },
+    {
         path: '/calendar',
         name: 'calendar',
         component: CalendarView,
         meta: {
             title: 'Календарь',
             middleware: [authMiddleware]
-
         }
     },
     {
@@ -112,6 +132,15 @@ const routes = [
         }
     },
     {
+        path: '/cash-cards/',
+        name: 'cash-cards',
+        component: CashCardsView,
+        meta: {
+            title: 'Кошелёк',
+            middleware: [authMiddleware]
+        }
+    },
+    {
         path: '/auth/signin',
         name: 'signin',
         component: SigninView,
@@ -147,7 +176,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-    document.title = `Vue.js ${to.meta.title} | TailAdmin - Vue.js Tailwind CSS Dashboard Template`
+    document.title = `${to.meta.title}`
 
     if (!to.meta?.middleware) {
         return next()

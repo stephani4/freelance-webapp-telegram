@@ -15,16 +15,12 @@ import {useFilesStore} from "@/stores/files";
 
 export default defineComponent({
   setup() {
-    const progressLoaders = reactive({
-      progressLoadMainTemplate: 0,
-    });
-
     const statusLoaders = reactive({
-      loadMainTemplate: 'denied',
+      loadFiles: 'denied',
     });
 
-    const imagesPaths = reactive({
-      mainTemplatePath: '',
+    const progressLoaders = reactive({
+      progressLoadFiles: 0,
     });
 
     const pageTitle = ref('Создание задачи');
@@ -42,17 +38,20 @@ export default defineComponent({
     const {form, v} = storeToRefs(storeTask);
 
     const uploadFilesTemplate = async (files) => {
-      statusLoaders.loadMainTemplate = 'process';
+      statusLoaders.loadFiles = 'process';
       await fileStore.uploadFiles(
-          files[0],
-          'single',
-          ({loaded, total}) => progressLoaders.progressLoadMainTemplate = (loaded / total) * 100
+          files,
+          'multiple',
+          ({loaded, total}) => progressLoaders.progressLoadFiles = (loaded / total) * 100
       );
 
-      form.value.mainImage = payload.files.id;
-      imagesPaths.mainTemplatePath = payload.path;
+      payload.files.forEach(file => {
+        form.value.files.push(file);
+      });
 
-      statusLoaders.loadMainTemplate = 'complete';
+      statusLoaders.loadFiles = 'denied';
+
+      progressLoaders.progressLoadFiles = 0;
     };
 
     const createTaskHandler = async () => {
@@ -102,7 +101,6 @@ export default defineComponent({
       statusFileUpload,
       progressLoaders,
       statusLoaders,
-      imagesPaths,
 
       progress,
       createTask,

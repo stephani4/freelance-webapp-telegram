@@ -7,8 +7,19 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import {ref} from 'vue'
 import {useAuthStore} from "@/stores/auth";
 
-const {registerUser} = useAuthStore();
 const pageTitle = ref('Регистрация');
+
+const authStore = useAuthStore();
+const user = authStore.user;
+
+const registerUser = async (data) => {
+  try {
+    await authStore.registerUser(data);
+    user.register = true;
+  } catch(error) {
+    alert(error.message);
+  }
+};
 
 const name = ref('');
 const email = ref('');
@@ -20,13 +31,14 @@ const maxSymbols = ref(200);
 const writeDescription = (input) => {
   const target = input.target;
 
-  if (target.value.length > 200) {
-    description.value = target.value = target.value.substring(0, 200);
+  if (target.value.length > maxSymbols.value) {
+    description.value = target.value = target.value.substring(0, maxSymbols.value);
 
   } else {
     description.value = target.value;
   }
-}
+};
+
 </script>
 
 <template>
@@ -109,7 +121,7 @@ const writeDescription = (input) => {
 
         <div class="mb-5 mt-6">
           <button
-              @click="registerUser({name, description, email, specialty, telegramId: '6812184116'})"
+              @click="registerUser({name, description, email, specialty})"
               type="button"
               class="w-full cursor-pointer rounded-lg border border-primary bg-primary p-4 font-medium text-white transition hover:bg-opacity-90">
             Создать профиль

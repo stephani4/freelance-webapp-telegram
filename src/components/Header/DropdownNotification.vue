@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { onClickOutside } from '@vueuse/core'
 import { ref, defineProps, computed} from 'vue'
-import moment from "moment";
 
 const target = ref(null)
 const dropdownOpen = ref(false)
 
 onClickOutside(target, () => {
   dropdownOpen.value = false
-})
+});
 
 const props = defineProps({
   notifications: Array,
+  handlerRead: Function,
 });
 
 const notifying = computed(() => {
@@ -20,34 +20,21 @@ const notifying = computed(() => {
       .length
 });
 
+const getPathByPayloadNotice = (payload: Object): string => {
+  const type = payload?.type || '';
+  if (!type.length) return '';
 
-// const notificationItems = ref([
-//   {
-//     route: '#',
-//     title: 'Edit your information in a swipe',
-//     details:
-//       'Sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim.',
-//     time: '12 May, 2025'
-//   },
-//   {
-//     route: '#',
-//     title: 'It is a long established fact',
-//     details: 'that a reader will be distracted by the readable.',
-//     time: '24 Feb, 2025'
-//   },
-//   {
-//     route: '#',
-//     title: 'There are many variations',
-//     details: 'of passages of Lorem Ipsum available, but the majority have suffered',
-//     time: '04 Jan, 2025'
-//   },
-//   {
-//     route: '#',
-//     title: 'There are many variations',
-//     details: 'of passages of Lorem Ipsum available, but the majority have suffered',
-//     time: '01 Dec, 2024'
-//   }
-// ])
+  let path = '';
+  switch (type) {
+    case 'task_execute_request_sended':
+      const taskId = payload?.task_id || '';
+      path =  `/tasks/my/${taskId}/edit`;
+      break;
+  }
+
+  return path;
+};
+
 </script>
 
 <template>
@@ -55,7 +42,7 @@ const notifying = computed(() => {
     <router-link
       class="relative flex h-8.5 w-8.5 items-center justify-center rounded-full border-[0.5px] border-stroke bg-gray hover:text-primary dark:border-strokedark dark:bg-meta-4 dark:text-white"
       to="#"
-      @click.prevent="(dropdownOpen = !dropdownOpen), (notifying = false)"
+      @click.prevent="(dropdownOpen = !dropdownOpen)"
     >
       <span
         :class="!notifying && 'hidden'"
@@ -90,17 +77,17 @@ const notifying = computed(() => {
         <h5 class="text-sm font-medium text-bodydark2">Уведомления</h5>
       </div>
 
-      <ul class="flex h-auto flex-col overflow-y-auto">
+      <ul v-if="props.notifications.length" class="flex h-auto flex-col overflow-y-auto">
         <template v-for="(item, index) in props.notifications" :key="index">
           <li>
             <router-link
               class="flex flex-col gap-2.5 border-t border-stroke px-4.5 py-3 hover:bg-gray-2 dark:border-strokedark dark:hover:bg-meta-4"
-              :to="item.route"
+              @click="props.handlerRead(item)"
+              :to="getPathByPayloadNotice(item.data.payload)"
             >
               <p class="text-sm">
                 <span class="text-black dark:text-white">
-                  <template v-if="!item.read_at"></template>
-                  <span class="text-danger">•</span>
+                  <span v-if="!item.read_at" class="text-danger">•</span>
                   {{ item.data.title }}
                 </span>
 
@@ -117,6 +104,8 @@ const notifying = computed(() => {
           </li>
         </template>
       </ul>
+
+      <span v-else>У вас нет уведомлений</span>
     </div>
     <!-- Dropdown End -->
   </li>

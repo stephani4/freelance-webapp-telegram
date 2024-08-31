@@ -28,8 +28,13 @@ export default defineComponent({
     Card,
   },
   async beforeRouteEnter(to, from, next) {
-    const {loadMyTasks} = useTasksStore();
-    await loadMyTasks();
+    try {
+      const {loadMyTasks} = useTasksStore();
+      await loadMyTasks();
+    } catch (error) {
+      alert(JSON.stringify(error.response))
+    }
+
     next();
   }
 })
@@ -66,6 +71,7 @@ export default defineComponent({
         :statuses="statuses"
         :tasks="myTasks.list"
         :total="myTasks.total"
+        :mode="`my`"
     />
   </DefaultLayout>
 </template>

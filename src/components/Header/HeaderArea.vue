@@ -10,7 +10,9 @@ const { toggleSidebar } = useSidebarStore()
 const sidebarStore = useSidebarStore()
 
 const props = defineProps({
-  notifications: Array
+  chats: Array,
+  notifications: Array,
+  readableNoticeHandler: Function,
 });
 </script>
 
@@ -107,11 +109,16 @@ const props = defineProps({
           </li>
 
           <!-- Notification Menu Area -->
-          <DropdownNotification :notifications="props.notifications" />
+          <DropdownNotification
+              :notifications="props.notifications"
+              :handlerRead="props.readableNoticeHandler"
+          />
           <!-- Notification Menu Area -->
 
           <!-- Chat Notification Area -->
-          <DropdownMessage />
+          <DropdownMessage
+              :chats="props.chats"
+          />
           <!-- Chat Notification Area -->
         </ul>
 

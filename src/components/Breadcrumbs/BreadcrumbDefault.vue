@@ -5,9 +5,13 @@ const props = defineProps(['pageTitle', 'pageName'])
 <template>
   <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
     <div class="flex justify-between">
-      <h2 class="text-title-md2 text-black dark:text-white">
-        {{ props.pageName}}
-      </h2>
+      <div class="page-name flex">
+        <h2 class="text-title-md2 text-black dark:text-white">
+          {{ props.pageName}}
+        </h2>
+
+        <slot name="badge"></slot>
+      </div>
 
       <slot name="actions"></slot>
     </div>

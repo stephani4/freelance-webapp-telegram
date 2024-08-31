@@ -12,6 +12,7 @@ import Chip from "primevue/chip";
 import FileUpload from "primevue/fileupload";
 import ProgressBar from 'primevue/progressbar';
 import Image from 'primevue/image';
+import FilesList from '@/components/Lists/FilesList.vue';
 
 export default defineComponent({
   setup(props, {emit}) {
@@ -19,8 +20,8 @@ export default defineComponent({
       props.form.category = null;
     };
 
-    const create = () => {
-      emit('create');
+    const updateOrCreate = () => {
+      emit(props.mode === 'edit' ? 'update' : 'create');
     };
 
     const uploadFiles = async (data) => {
@@ -31,9 +32,10 @@ export default defineComponent({
 
     const {getFilePublicPath} = useFilesStore();
 
-    return {uploadFiles, getFilePublicPath, removeCategory, create, progress, props};
+    return {uploadFiles, getFilePublicPath, removeCategory, updateOrCreate, progress, props};
   },
   components: {
+    FilesList,
     ProgressBar,
     Select,
     Textarea,
@@ -54,6 +56,7 @@ export default defineComponent({
     statusLoaders: Object,
     progressLoaders: Object,
     imagesPaths: Object,
+    mode: String,
   }
 });
 </script>
@@ -69,12 +72,43 @@ export default defineComponent({
     </span>
   </div>
   <div class="mb-4 flex flex-col">
-    <label>Описание задачи</label>
-    <Textarea v-model="props.form.description" :invalid="props.validator.description.$errors.length"
-              placeholder="Опишите задачу подробно"/>
+    <label>Детальное описание задачи</label>
+    <Textarea
+        v-model="props.form.description"
+        :invalid="props.validator.description.$errors.length"
+        placeholder="Опишите задачу подробно"
+        class="mb-2"
+    />
     <span v-if="props.validator.description.$errors.length" class="text-danger">
       {{ props.validator.description.$errors[0].$message }}
     </span>
+
+    <template v-if="props.form.files.length">
+      <FilesList :files="props.form.files" />
+    </template>
+
+    <FileUpload
+        v-if="props.statusLoaders.loadFiles === 'denied'"
+        :disabled="statusLoading"
+        @uploader="uploadFiles"
+        @upload="uploadFiles"
+        customUpload
+        class="justify-start"
+        mode="basic"
+        multiple
+        name="file[]"
+        url="http://127.0.0.1:8000/api/telegram/files/upload"
+        accept="image/*"
+        :maxFileSize="1000000 * 3"
+        :auto="true"
+        @progress="progress"
+        chooseLabel="Прикрепить файлы"
+    />
+
+    <ProgressBar
+        v-if="props.statusLoaders.loadFiles === 'process'"
+        :value="props.progressLoaders.progressLoadFiles"
+    />
   </div>
   <div class="mb-4 flex flex-col">
     <label>Цена, руб</label>
@@ -104,45 +138,8 @@ export default defineComponent({
     </span>
   </div>
 
-  <span class="font-semibold block mb-2">Файлы</span>
-
-  <div class="mb-4 flex flex-col justify-start">
-    <label>Заставка <span class="text-danger">*</span></label>
-
-    <FileUpload
-        v-if="props.statusLoaders.loadMainTemplate === 'denied'"
-        :disabled="statusLoading"
-        customUpload
-        @uploader="uploadFiles"
-        class="justify-start"
-        mode="basic"
-        name="file[]"
-        url="http://127.0.0.1:8000/api/telegram/files/upload"
-        accept="image/*"
-        :maxFileSize="1000000"
-        @upload="uploadFiles"
-        :auto="true"
-        chooseLabel="Загрузить основное фото"
-        @progress="progress"
-    />
-
-    <ProgressBar
-        v-if="props.statusLoaders.loadMainTemplate === 'process'"
-        :value="props.progressLoaders.progressLoadMainTemplate"
-    />
-
-    <Image
-        :src="getFilePublicPath(props.imagesPaths.mainTemplatePath)"
-        v-if="props.statusLoaders.loadMainTemplate === 'complete'"
-    />
-
-    <span v-if="props.validator.mainImage.$errors.length" class="text-danger">
-      {{ props.validator.mainImage.$errors[0].$message }}
-    </span>
-  </div>
-
   <div class="flex justify-end">
     <Button label="Отменить" severity="secondary"/>
-    <Button @click="create" label="Создать" class="ml-2"/>
+    <Button @click="updateOrCreate" :label="props.mode === 'edit' ? 'Обновить' : 'Создать'" class="ml-2"/>
   </div>
 </template>

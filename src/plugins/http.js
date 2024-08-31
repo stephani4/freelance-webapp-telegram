@@ -1,15 +1,11 @@
 import axios from 'axios';
 
 import {useTokensStore} from "../stores/tokens";
+import {useAuthStore} from "../stores/auth";
 const {getAccessToken} = useTokensStore();
 
-import {useAuthStore} from "../stores/auth";
-
-// import {useWebApp} from "vue-tg";
-// const {webAppInit} = useWebApp();
-
 const http = axios.create({
-    baseURL: 'http://127.0.0.1:8000/api'
+    baseURL: 'https://n2p5b4-95-181-26-94.ru.tuna.am/api'
 });
 
 http.interceptors.request.use(function (config) {
@@ -18,8 +14,8 @@ http.interceptors.request.use(function (config) {
 });
 
 const HTTP_UNAUTHORIZED_CODE = 401;
-
 const {log} = console;
+
 http.interceptors.response.use(
     (response) => {
         return response;
@@ -32,7 +28,8 @@ http.interceptors.response.use(
 
         const status = response?.status;
         if (status === HTTP_UNAUTHORIZED_CODE) {
-            await refreshTokenUser(6812184116)
+            // Обновляем токе по userID Telegram
+            await refreshTokenUser(6812184116);
         }
 
         return Promise.reject(error);

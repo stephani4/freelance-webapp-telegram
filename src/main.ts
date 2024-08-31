@@ -8,9 +8,11 @@ import './assets/css/style.css'
 import 'flatpickr/dist/flatpickr.min.css'
 import "flowbite/dist/flowbite.min";
 import 'primeicons/primeicons.css'
+import 'vue-material-design-icons/styles.css';
 
 import {createApp} from 'vue'
 import {createPinia} from 'pinia'
+import { VueTelegramPlugin } from 'vue-tg'
 import VueApexCharts from 'vue3-apexcharts'
 
 import App from './App.vue'
@@ -21,7 +23,7 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(router)
 app.use(VueApexCharts)
-
+app.use(VueTelegramPlugin);
 app.use(ToastService);
 app.use(PrimeVue, {
     theme: {

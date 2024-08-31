@@ -3,6 +3,7 @@ import {defineStore} from "pinia";
 import moment from "moment";
 
 import {load} from "@/services/notifications/load";
+import {readed} from "@/services/notifications/readed";
 
 export const useNotificationStore = defineStore('notification', () => {
     const notifications = ref([]);
@@ -19,5 +20,12 @@ export const useNotificationStore = defineStore('notification', () => {
         notifications.value = notificationList;
     };
 
-    return {notifications, loadNotifications};
+    const toReadable = async (notificationId: number) => {
+        const response = await readed(notificationId);
+        const notice = response.data;
+        const readableNotice = notifications.value.find(item => item.id === notice.id);
+        readableNotice.read_at = notice.read_at;
+    };
+
+    return {notifications, loadNotifications, toReadable};
 });

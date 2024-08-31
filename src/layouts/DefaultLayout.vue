@@ -1,17 +1,30 @@
 <script>
 import {defineComponent} from "vue";
-import {mapState} from "pinia";
+import {mapState, storeToRefs} from "pinia";
 
 import HeaderArea from '@/components/Header/HeaderArea.vue'
 import SidebarArea from '@/components/Sidebar/SidebarArea.vue'
 
 import {useAuthStore} from "@/stores/auth";
 import {useNotificationStore} from "@/stores/notification";
+import {useChatsStore} from "@/stores/chats";
 
 export default defineComponent({
+  setup() {
+    const notificationStore = useNotificationStore();
+    const chatsStore = useChatsStore();
+
+    const toReadable = async (notification) => {
+      if (notification.read_at) return;
+      await notificationStore.toReadable(notification.id);
+    };
+
+    return {toReadable};
+  },
   computed: {
-    ...mapState(useAuthStore, ['auth']),
+    ...mapState(useAuthStore, ['auth', 'user']),
     ...mapState(useNotificationStore, ['notifications']),
+    ...mapState(useChatsStore, ['headerChats']),
   },
   components: {
     HeaderArea,
@@ -24,13 +37,18 @@ export default defineComponent({
   <!-- ===== Page Wrapper Start ===== -->
   <div class="flex h-screen overflow-hidden">
     <!-- ===== Sidebar Start ===== -->
-    <SidebarArea v-if="auth" />
+    <SidebarArea v-if="auth && user?.register"/>
     <!-- ===== Sidebar End ===== -->
 
     <!-- ===== Content Area Start ===== -->
     <div class="relative flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
       <!-- ===== Header Start ===== -->
-      <HeaderArea v-if="auth" :notifications="notifications" />
+      <HeaderArea
+          v-if="auth && user?.register"
+          :chats="headerChats"
+          :notifications="notifications"
+          :readableNoticeHandler="toReadable"
+      />
       <!-- ===== Header End ===== -->
 
       <!-- ===== Main Content Start ===== -->

@@ -4,6 +4,7 @@ import {storeToRefs, mapStores} from "pinia";
 import {useTasksStore} from "@/stores/tasks";
 import {useStatusesStore} from "@/stores/statuses";
 
+import Badge from "primevue/badge";
 import DefaultLayout from "@/layouts/DefaultLayout.vue";
 import BreadcrumbDefault from '@/components/Breadcrumbs/BreadcrumbDefault.vue';
 import TaskCardList from "@/components/CardLists/TaskCardList.vue";
@@ -30,7 +31,11 @@ onMounted(async () => {
 
 <template>
   <DefaultLayout>
-    <BreadcrumbDefault :page-name="pageTitle" :page-title="pageTitle"/>
+    <BreadcrumbDefault :page-name="pageTitle" :page-title="pageTitle">
+      <template v-slot:badge>
+        <Badge :value="moderateTasks.total" severity="warning" />
+      </template>
+    </BreadcrumbDefault>
 
     <TaskCardList
         @toggleAccept="accept"
