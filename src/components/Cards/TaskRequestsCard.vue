@@ -4,18 +4,20 @@ import {defineProps, defineEmits} from "vue";
 import Button from "primevue/button";
 import Card from "primevue/card";
 import Badge from "primevue/badge";
+import Chat from 'vue-material-design-icons/Chat.vue';
+
 
 const props = defineProps({
   requests: Array,
 });
 
-const emits = defineEmits(["cancelRequest"]);
+const emits = defineEmits(["cancelRequest", "openChat"]);
 </script>
 
 <template>
   <Card v-for="(request, i) in props.requests" :key="i">
     <template #content>
-      <div class="flex relative">
+      <div class="flex relative mb-2">
         <Badge
             value="Отклонен"
             severity="danger"
@@ -31,8 +33,12 @@ const emits = defineEmits(["cancelRequest"]);
         </div>
       </div>
       <div class="flex justify-end gap-2">
-        <Button @click="emits('cancelRequest', request)" v-if="request.status !== 'cancel'" label="Отказать" size="small" outlined severity="danger" />
+        <Button @click="emits('openChat', request)" label="Чат" size="small" outlined severity="primary">
+          <Chat /> Открыть чат
+        </Button>
+
         <Button v-if="request.status !== 'cancel'" label="Принять" size="small" outlined severity="success" />
+        <Button @click="emits('cancelRequest', request)" v-if="request.status !== 'cancel'" label="Отказать" size="small" outlined severity="danger" />
       </div>
     </template>
   </Card>
