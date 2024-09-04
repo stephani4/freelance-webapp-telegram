@@ -81,7 +81,7 @@ onClickOutside(target, () => {
               </div>
 
               <div>
-                <h6 class="text-sm font-medium text-black dark:text-white">{{ item.users_name }}</h6>
+                <h6 class="text-sm font-medium text-black dark:text-white">{{ item.members[0].users_name }}</h6>
                 <p class="text-sm">{{ item.message_text }}</p>
                 <p class="text-xs">{{ item.message_created_at }}</p>
               </div>

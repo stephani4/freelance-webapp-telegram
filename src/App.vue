@@ -17,12 +17,6 @@ export default defineComponent({
   },
 
   async beforeCreate() {
-    try {
-      const wsStore = useWsStore();
-    } catch (e) {
-      console.error(e)
-    }
-
     const {setMode, checkAuthUserWebapp} = useAuthStore();
     const {mode} = storeToRefs(useAuthStore());
 
@@ -46,9 +40,9 @@ export default defineComponent({
 
     // Загружаем чаты
     const chatsStore = useChatsStore();
-    const {emitHeaderChats, onHeaderChats} = chatsStore;
-    onHeaderChats();
+    const {emitHeaderChats, bindEvents} = chatsStore;
     emitHeaderChats();
+    bindEvents();
 
     try {
       // Загружаем уведомления

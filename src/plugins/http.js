@@ -5,7 +5,7 @@ import {useAuthStore} from "../stores/auth";
 const {getAccessToken} = useTokensStore();
 
 const http = axios.create({
-    baseURL: 'https://n2p5b4-95-181-26-94.ru.tuna.am/api'
+    baseURL: 'https://k2wkk7-95-181-26-94.ru.tuna.am/api'
 });
 
 http.interceptors.request.use(function (config) {

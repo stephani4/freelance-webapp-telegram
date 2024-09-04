@@ -18,6 +18,8 @@ import {useTasksStore} from "@/stores/tasks";
 import {useTaskFilesStore} from "@/stores/task-files-store";
 import {useServiceCategoriesStore} from "@/stores/serviceCategories";
 import {storeToRefs} from "pinia";
+import {useChatsStore} from "@/stores/chats";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   setup() {
@@ -25,6 +27,7 @@ export default defineComponent({
     const taskStore = useTasksStore();
     const taskFileStore = useTaskFilesStore();
     const serviceCategoriesStore = useServiceCategoriesStore();
+    const chatStore = useChatsStore();
 
     const statusLoaders = taskFileStore.statusLoaders;
     const progressLoaders = taskFileStore.progressLoaders;
@@ -48,6 +51,12 @@ export default defineComponent({
       await taskStore.updateTask();
     };
 
+    const router = useRouter();
+    const openChat = async (data) => {
+      const chatData = await chatStore.createChat(data.user_id);
+      await router.push({name: 'chat', params: {chat: chatData.id}});
+    };
+
     return {
       taskForm,
       taskFormV,
@@ -59,6 +68,7 @@ export default defineComponent({
       update,
       uploadFiles,
       cancelRequest,
+      openChat,
     };
   },
   components: {
@@ -118,6 +128,7 @@ export default defineComponent({
         </TabPanel>
         <TabPanel value="1">
           <TaskRequestsCard
+              @openChat="openChat"
               @cancelRequest="cancelRequest"
               :requests="taskForm.requests"
           />
